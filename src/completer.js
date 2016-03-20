@@ -78,7 +78,7 @@
       throw new Error('textcomplete must be called on a Textarea or a ContentEditable.');
     }
 
-    if (element === document.activeElement) {
+    if (element === this.option.window.document.activeElement) {
       // element has already been focused. Initialize view objects immediately.
       this.initialize()
     } else {

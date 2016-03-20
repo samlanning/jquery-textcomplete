@@ -17,12 +17,13 @@
   };
 
   var dropdownViews = {};
-  $(document).on('click', function (e) {
+  var documentsWithListeners = [];
+  var onDocumentClick = function (e) {
     var id = e.originalEvent && e.originalEvent.keepTextCompleteDropdown;
     $.each(dropdownViews, function (key, view) {
       if (key !== id) { view.deactivate(); }
     });
-  });
+  };
 
   var commands = {
     SKIP_DEFAULT: 0,
@@ -48,6 +49,12 @@
     this.$inputEl  = $(element);
     this.option    = option;
     this.$window   = $(option.window);
+
+    // Setup Document Click Listener
+    if (documentsWithListeners.indexOf(option.window.document) === -1) {
+      $(option.window.document).on('click', onDocumentClick);
+      documentsWithListeners.push(option.window.document);
+    }
 
     // Override setPosition method.
     if (option.listPosition) { this.setPosition = option.listPosition; }

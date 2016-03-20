@@ -38,13 +38,13 @@
         range.deleteContents();
 
         // create temporary elements
-        var preWrapper = document.createElement("div");
+        var preWrapper = this.option.window.document.createElement("div");
         preWrapper.innerHTML = pre;
-        var postWrapper = document.createElement("div");
+        var postWrapper = this.option.window.document.createElement("div");
         postWrapper.innerHTML = post;
 
         // create the fragment thats inserted
-        var fragment = document.createDocumentFragment();
+        var fragment = this.option.window.document.createDocumentFragment();
         var childNode;
         var lastOfPre;
         while (childNode = preWrapper.firstChild) {
@@ -78,7 +78,7 @@
     // Dropdown's position will be decided using the result.
     _getCaretRelativePosition: function () {
       var range = this.option.window.getSelection().getRangeAt(0).cloneRange();
-      var node = document.createElement('span');
+      var node = this.option.window.document.createElement('span');
       range.insertNode(node);
       range.selectNodeContents(node);
       range.deleteContents();

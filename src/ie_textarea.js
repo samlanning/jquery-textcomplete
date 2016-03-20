@@ -38,7 +38,7 @@
 
     getTextFromHeadToCaret: function () {
       this.el.focus();
-      var range = document.selection.createRange();
+      var range = this.option.window.document.selection.createRange();
       range.moveStart('character', -this.el.value.length);
       var arr = range.text.split(sentinelChar)
       return arr.length === 1 ? arr[0] : arr[1];
