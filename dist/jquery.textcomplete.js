@@ -167,6 +167,7 @@ if (typeof jQuery === 'undefined') {
     if (!Completer.DEFAULTS) {
       Completer.DEFAULTS = {
         appendTo: $('body'),
+        window: window,
         zIndex: '100'
       };
     }
@@ -331,8 +332,6 @@ if (typeof jQuery === 'undefined') {
 +function ($) {
   'use strict';
 
-  var $window = $(window);
-
   var include = function (zippedData, datum) {
     var i, elem;
     var idProperty = datum.strategy.idProperty
@@ -379,6 +378,7 @@ if (typeof jQuery === 'undefined') {
     this._data     = []; // zipped data.
     this.$inputEl  = $(element);
     this.option    = option;
+    this.$window   = $(option.window);
 
     // Override setPosition method.
     if (option.listPosition) { this.setPosition = option.listPosition; }
@@ -474,13 +474,14 @@ if (typeof jQuery === 'undefined') {
       // This can't be done during init, as textcomplete may be used on multiple elements on the same page
       // Because the same dropdown is reused behind the scenes, we need to recheck every time the dropdown is showed
       var position = 'absolute';
+      var $window  = this.$window;
       // Check if input or one of its parents has positioning we need to care about
       this.$inputEl.add(this.$inputEl.parents()).each(function() {
         if($(this).css('position') === 'absolute') // The element has absolute positioning, so it's all OK
           return false;
         if($(this).css('position') === 'fixed') {
           pos.top -= $window.scrollTop();
-          pos.left -= $window.scrollLeft();					
+          pos.left -= $window.scrollLeft();
           position = 'fixed';
           return false;
         }
@@ -782,7 +783,7 @@ if (typeof jQuery === 'undefined') {
     },
 
     _fitToBottom: function() {
-      var windowScrollBottom = $window.scrollTop() + $window.height();
+      var windowScrollBottom = this.$window.scrollTop() + this.$window.height();
       var height = this.$el.height();
       if ((this.$el.position().top + height) > windowScrollBottom) {
         this.$el.offset({top: windowScrollBottom - height});
@@ -795,7 +796,7 @@ if (typeof jQuery === 'undefined') {
       // (which makes our elements wrap onto the next line and corrupt the next item), if we're close to the right
       // edge, move left. We don't know how far to move left, so just keep nudging a bit.
       var tolerance = 30; // pixels. Make wider than vertical scrollbar because we might not be able to use that space.
-      while (this.$el.offset().left + this.$el.width() > $window.width() - tolerance) {
+      while (this.$el.offset().left + this.$el.width() > this.$window.width() - tolerance) {
         this.$el.offset({left: this.$el.offset().left - tolerance});
       }
     },
@@ -1137,7 +1138,7 @@ if (typeof jQuery === 'undefined') {
     // When an dropdown item is selected, it is executed.
     select: function (value, strategy, e) {
       var pre = this.getTextFromHeadToCaret();
-      var sel = window.getSelection()
+      var sel = this.option.window.getSelection()
       var range = sel.getRangeAt(0);
       var selection = range.cloneRange();
       selection.selectNodeContents(range.startContainer);
@@ -1152,13 +1153,13 @@ if (typeof jQuery === 'undefined') {
         pre = pre.replace(strategy.match, newSubstr);
         range.selectNodeContents(range.startContainer);
         range.deleteContents();
-        
+
         // create temporary elements
         var preWrapper = document.createElement("div");
         preWrapper.innerHTML = pre;
         var postWrapper = document.createElement("div");
         postWrapper.innerHTML = post;
-        
+
         // create the fragment thats inserted
         var fragment = document.createDocumentFragment();
         var childNode;
@@ -1169,11 +1170,11 @@ if (typeof jQuery === 'undefined') {
         while (childNode = postWrapper.firstChild) {
         	fragment.appendChild(childNode);
         }
-        
+
         // insert the fragment & jump behind the last node in "pre"
         range.insertNode(fragment);
         range.setStartAfter(lastOfPre);
-        
+
         range.collapse(true);
         sel.removeAllRanges();
         sel.addRange(range);
@@ -1193,7 +1194,7 @@ if (typeof jQuery === 'undefined') {
     //
     // Dropdown's position will be decided using the result.
     _getCaretRelativePosition: function () {
-      var range = window.getSelection().getRangeAt(0).cloneRange();
+      var range = this.option.window.getSelection().getRangeAt(0).cloneRange();
       var node = document.createElement('span');
       range.insertNode(node);
       range.selectNodeContents(node);
@@ -1216,7 +1217,7 @@ if (typeof jQuery === 'undefined') {
     //   this.getTextFromHeadToCaret()
     //   // => ' wor'  // not '<b>hello</b> wor'
     getTextFromHeadToCaret: function () {
-      var range = window.getSelection().getRangeAt(0);
+      var range = this.option.window.getSelection().getRangeAt(0);
       var selection = range.cloneRange();
       selection.selectNodeContents(range.startContainer);
       return selection.toString().substring(0, range.startOffset);
