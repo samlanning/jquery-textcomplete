@@ -21,7 +21,7 @@
     // When an dropdown item is selected, it is executed.
     select: function (value, strategy, e) {
       var pre = this.getTextFromHeadToCaret();
-      var sel = window.getSelection()
+      var sel = this.option.window.getSelection()
       var range = sel.getRangeAt(0);
       var selection = range.cloneRange();
       selection.selectNodeContents(range.startContainer);
@@ -36,13 +36,13 @@
         pre = pre.replace(strategy.match, newSubstr);
         range.selectNodeContents(range.startContainer);
         range.deleteContents();
-        
+
         // create temporary elements
         var preWrapper = document.createElement("div");
         preWrapper.innerHTML = pre;
         var postWrapper = document.createElement("div");
         postWrapper.innerHTML = post;
-        
+
         // create the fragment thats inserted
         var fragment = document.createDocumentFragment();
         var childNode;
@@ -53,11 +53,11 @@
         while (childNode = postWrapper.firstChild) {
         	fragment.appendChild(childNode);
         }
-        
+
         // insert the fragment & jump behind the last node in "pre"
         range.insertNode(fragment);
         range.setStartAfter(lastOfPre);
-        
+
         range.collapse(true);
         sel.removeAllRanges();
         sel.addRange(range);
@@ -77,7 +77,7 @@
     //
     // Dropdown's position will be decided using the result.
     _getCaretRelativePosition: function () {
-      var range = window.getSelection().getRangeAt(0).cloneRange();
+      var range = this.option.window.getSelection().getRangeAt(0).cloneRange();
       var node = document.createElement('span');
       range.insertNode(node);
       range.selectNodeContents(node);
@@ -100,7 +100,7 @@
     //   this.getTextFromHeadToCaret()
     //   // => ' wor'  // not '<b>hello</b> wor'
     getTextFromHeadToCaret: function () {
-      var range = window.getSelection().getRangeAt(0);
+      var range = this.option.window.getSelection().getRangeAt(0);
       var selection = range.cloneRange();
       selection.selectNodeContents(range.startContainer);
       return selection.toString().substring(0, range.startOffset);

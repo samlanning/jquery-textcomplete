@@ -92,6 +92,7 @@
     if (!Completer.DEFAULTS) {
       Completer.DEFAULTS = {
         appendTo: $('body'),
+        window: window,
         zIndex: '100'
       };
     }

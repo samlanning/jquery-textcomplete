@@ -1,8 +1,6 @@
 +function ($) {
   'use strict';
 
-  var $window = $(window);
-
   var include = function (zippedData, datum) {
     var i, elem;
     var idProperty = datum.strategy.idProperty
@@ -49,6 +47,7 @@
     this._data     = []; // zipped data.
     this.$inputEl  = $(element);
     this.option    = option;
+    this.$window   = $(option.window);
 
     // Override setPosition method.
     if (option.listPosition) { this.setPosition = option.listPosition; }
@@ -144,13 +143,14 @@
       // This can't be done during init, as textcomplete may be used on multiple elements on the same page
       // Because the same dropdown is reused behind the scenes, we need to recheck every time the dropdown is showed
       var position = 'absolute';
+      var $window  = this.$window;
       // Check if input or one of its parents has positioning we need to care about
       this.$inputEl.add(this.$inputEl.parents()).each(function() {
         if($(this).css('position') === 'absolute') // The element has absolute positioning, so it's all OK
           return false;
         if($(this).css('position') === 'fixed') {
           pos.top -= $window.scrollTop();
-          pos.left -= $window.scrollLeft();					
+          pos.left -= $window.scrollLeft();
           position = 'fixed';
           return false;
         }
@@ -452,7 +452,7 @@
     },
 
     _fitToBottom: function() {
-      var windowScrollBottom = $window.scrollTop() + $window.height();
+      var windowScrollBottom = this.$window.scrollTop() + this.$window.height();
       var height = this.$el.height();
       if ((this.$el.position().top + height) > windowScrollBottom) {
         this.$el.offset({top: windowScrollBottom - height});
@@ -465,7 +465,7 @@
       // (which makes our elements wrap onto the next line and corrupt the next item), if we're close to the right
       // edge, move left. We don't know how far to move left, so just keep nudging a bit.
       var tolerance = 30; // pixels. Make wider than vertical scrollbar because we might not be able to use that space.
-      while (this.$el.offset().left + this.$el.width() > $window.width() - tolerance) {
+      while (this.$el.offset().left + this.$el.width() > this.$window.width() - tolerance) {
         this.$el.offset({left: this.$el.offset().left - tolerance});
       }
     },
