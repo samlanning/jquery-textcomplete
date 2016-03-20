@@ -153,7 +153,7 @@ if (typeof jQuery === 'undefined') {
       throw new Error('textcomplete must be called on a Textarea or a ContentEditable.');
     }
 
-    if (element === document.activeElement) {
+    if (element === this.option.window.document.activeElement) {
       // element has already been focused. Initialize view objects immediately.
       this.initialize()
     } else {
@@ -348,12 +348,13 @@ if (typeof jQuery === 'undefined') {
   };
 
   var dropdownViews = {};
-  $(document).on('click', function (e) {
+  var documentsWithListeners = [];
+  var onDocumentClick = function (e) {
     var id = e.originalEvent && e.originalEvent.keepTextCompleteDropdown;
     $.each(dropdownViews, function (key, view) {
       if (key !== id) { view.deactivate(); }
     });
-  });
+  };
 
   var commands = {
     SKIP_DEFAULT: 0,
@@ -379,6 +380,12 @@ if (typeof jQuery === 'undefined') {
     this.$inputEl  = $(element);
     this.option    = option;
     this.$window   = $(option.window);
+
+    // Setup Document Click Listener
+    if (documentsWithListeners.indexOf(option.window.document) === -1) {
+      $(option.window.document).on('click', onDocumentClick);
+      documentsWithListeners.push(option.window.document);
+    }
 
     // Override setPosition method.
     if (option.listPosition) { this.setPosition = option.listPosition; }
@@ -1105,7 +1112,7 @@ if (typeof jQuery === 'undefined') {
 
     getTextFromHeadToCaret: function () {
       this.el.focus();
-      var range = document.selection.createRange();
+      var range = this.option.window.document.selection.createRange();
       range.moveStart('character', -this.el.value.length);
       var arr = range.text.split(sentinelChar)
       return arr.length === 1 ? arr[0] : arr[1];
@@ -1155,13 +1162,13 @@ if (typeof jQuery === 'undefined') {
         range.deleteContents();
 
         // create temporary elements
-        var preWrapper = document.createElement("div");
+        var preWrapper = this.option.window.document.createElement("div");
         preWrapper.innerHTML = pre;
-        var postWrapper = document.createElement("div");
+        var postWrapper = this.option.window.document.createElement("div");
         postWrapper.innerHTML = post;
 
         // create the fragment thats inserted
-        var fragment = document.createDocumentFragment();
+        var fragment = this.option.window.document.createDocumentFragment();
         var childNode;
         var lastOfPre;
         while (childNode = preWrapper.firstChild) {
@@ -1195,7 +1202,7 @@ if (typeof jQuery === 'undefined') {
     // Dropdown's position will be decided using the result.
     _getCaretRelativePosition: function () {
       var range = this.option.window.getSelection().getRangeAt(0).cloneRange();
-      var node = document.createElement('span');
+      var node = this.option.window.document.createElement('span');
       range.insertNode(node);
       range.selectNodeContents(node);
       range.deleteContents();
